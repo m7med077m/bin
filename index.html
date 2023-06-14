@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bin IP Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 600px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    input {
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      background-color: #45a049;
+    }
+    
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      overflow-x: auto;
+    }
+    
+    .response-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .response-property {
+      display: flex;
+      margin-bottom: 5px;
+    }
+    
+    .response-property label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    
+    .response-property .flag {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bin IP Checker</h1>
+
+    <form id="binForm">
+      <label for="binInput">BIN Number:</label>
+      <input type="text" id="binInput" required>
+      <button type="submit">Check</button>
+    </form>
+
+    <div id="result"></div>
+  </div>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    // Get the form element and result div
+    const form = document.getElementById("binForm");
+    const resultDiv = document.getElementById("result");
+
+    // Add event listener to the form submit event
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      // Get the BIN number input value
+      const binInput = document.getElementById("binInput").value;
+
+      // Prepare the request options
+      const options = {
+        method: 'POST',
+        url: 'https://bin-ip-checker.p.rapidapi.com/',
+        params: { bin: binInput },
+        headers: {
+          'content-type': 'application/json',
+          'X-RapidAPI-Key': 'b4b76986admsh4ace8959ebfd8bep1109a9jsn7acb2a172e39',
+          'X-RapidAPI-Host': 'bin-ip-checker.p.rapidapi.com'
+        },
+        data: { bin: binInput }
+      };
+
+      try {
+        // Make the API request using Axios
+        const response = await axios.request(options);
+
+        // Process the API response and update the HTML
+        const responseData = response.data;
+
+        const formattedResponse = `
+          <div class="response-property">
+            <label>Valid:</label>
+            <span>${responseData.BIN.valid}</span>
+          </div>
+          <div class="response-property">
+            <label>Number:</label>
+            <span>${responseData.BIN.number}</span>
+          </div>
+          <div class="response-property">
+            <label>Scheme:</label>
+            <span>${responseData.BIN.scheme}</span>
+          </div>
+          <div class="response-property">
+            <label>Brand:</label>
+            <span>${responseData.BIN.brand}</span>
+          </div>
+          <div class="response-property">
+            <label>Type:</label>
+            <span>${responseData.BIN.type}</span>
+          </div>
+          <div class="response-property">
+            <label>Level:</label>
+            <span>${responseData.BIN.level}</span>
+          </div>
+          <div class="response-property">
+            <label>Currency:</label>
+            <span>${responseData.BIN.currency}</span>
+          </div>
+          <div class="response-property">
+            <label>Issuer:</label>
+            <span>${responseData.BIN.issuer.name}</span>
+          </div>
+          <div class="response-property">
+            <label>Country:</label>
+            <span>${responseData.BIN.country.name}</span>
+            <span class="flag">${responseData.BIN.country.flag}</span>
+          </div>
+        `;
+
+        resultDiv.innerHTML = formattedResponse;
+      } catch (error) {
+        // Handle any errors that occur during the API request
+        resultDiv.innerHTML = "<p>An error occurred while fetching the API data.</p>";
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
